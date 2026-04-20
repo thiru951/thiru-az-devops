@@ -13,12 +13,15 @@ steps:
   inputs:
     terraformVersion: '1.5.7'
 
+# ✅ INIT (fixed)
 - task: TerraformTaskV4@4
   displayName: Init
   inputs:
     provider: 'azurerm'
     command: 'init'
+    backendType: 'local'
 
+# ✅ PLAN
 - task: TerraformTaskV4@4
   displayName: Plan
   inputs:
@@ -29,6 +32,7 @@ steps:
       vm_username=$(vm-username)
       vm_password=$(vm-password)
 
+# ✅ APPLY
 - task: TerraformTaskV4@4
   displayName: Apply
   inputs:
