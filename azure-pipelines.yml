@@ -9,12 +9,28 @@ variables:
 
 steps:
 
+# Install Terraform
 - task: TerraformInstaller@1
   inputs:
     terraformVersion: '1.5.7'
 
-- script: |
-    terraform init
-    terraform plan -var "vm_username=$(vm-username)" -var "vm_password=$(vm-password)"
-    terraform apply -auto-approve -var "vm_username=$(vm-username)" -var "vm_password=$(vm-password)"
-  displayName: Terraform Run
+# Login to Azure using Service Connection
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'terraform-sp'
+    scriptType: bash
+    scriptLocation: inlineScript
+    inlineScript: |
+
+      echo "Initializing Terraform..."
+      terraform init
+
+      echo "Running Terraform Plan..."
+      terraform plan \
+        -var "vm_username=$(vm-username)" \
+        -var "vm_password=$(vm-password)"
+
+      echo "Applying Terraform..."
+      terraform apply -auto-approve \
+        -var "vm_username=$(vm-username)" \
+        -var "vm_password=$(vm-password)"
