@@ -1,0 +1,41 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+- group: kv-secrets
+
+steps:
+
+- task: TerraformInstaller@1
+  inputs:
+    terraformVersion: '1.5.7'
+
+- task: TerraformTaskV4@4
+  displayName: Init
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    backendServiceArm: 'terraform-sp'
+
+- task: TerraformTaskV4@4
+  displayName: Plan
+  inputs:
+    provider: 'azurerm'
+    command: 'plan'
+    environmentServiceNameAzureRM: 'terraform-sp'
+    vars: |
+      vm_username=$(vm-username)
+      vm_password=$(vm-password)
+
+- task: TerraformTaskV4@4
+  displayName: Apply
+  inputs:
+    provider: 'azurerm'
+    command: 'apply'
+    environmentServiceNameAzureRM: 'terraform-sp'
+    vars: |
+      vm_username=$(vm-username)
+      vm_password=$(vm-password)
