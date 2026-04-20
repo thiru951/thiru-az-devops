@@ -18,7 +18,6 @@ steps:
   inputs:
     provider: 'azurerm'
     command: 'init'
-    backendServiceArm: 'terraform-sp'
 
 - task: TerraformTaskV4@4
   displayName: Plan
