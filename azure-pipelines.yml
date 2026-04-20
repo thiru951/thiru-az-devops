@@ -13,32 +13,8 @@ steps:
   inputs:
     terraformVersion: '1.5.7'
 
-# ✅ INIT (fixed)
-- task: TerraformTaskV4@4
-  displayName: Init
-  inputs:
-    provider: 'azurerm'
-    command: 'init'
-    backendType: 'local'
-
-# ✅ PLAN
-- task: TerraformTaskV4@4
-  displayName: Plan
-  inputs:
-    provider: 'azurerm'
-    command: 'plan'
-    environmentServiceNameAzureRM: 'terraform-sp'
-    vars: |
-      vm_username=$(vm-username)
-      vm_password=$(vm-password)
-
-# ✅ APPLY
-- task: TerraformTaskV4@4
-  displayName: Apply
-  inputs:
-    provider: 'azurerm'
-    command: 'apply'
-    environmentServiceNameAzureRM: 'terraform-sp'
-    vars: |
-      vm_username=$(vm-username)
-      vm_password=$(vm-password)
+- script: |
+    terraform init
+    terraform plan -var "vm_username=$(vm-username)" -var "vm_password=$(vm-password)"
+    terraform apply -auto-approve -var "vm_username=$(vm-username)" -var "vm_password=$(vm-password)"
+  displayName: Terraform Run
