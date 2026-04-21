@@ -2,35 +2,20 @@ trigger:
 - main
 
 pool:
-  vmImage: 'ubuntu-latest'
-
-variables:
-- group: kv-secrets
+  vmImage: ubuntu-latest
 
 steps:
 
-# Install Terraform
 - task: TerraformInstaller@1
   inputs:
     terraformVersion: '1.5.7'
 
-# Run Terraform
 - task: AzureCLI@2
   inputs:
     azureSubscription: 'terraform-sp'
     scriptType: bash
     scriptLocation: inlineScript
     inlineScript: |
-
-      echo "Checking variables..."
-      echo "Username: $(vm-username)"
-
       terraform init
-
-      terraform plan \
-        -var "vm_username=$(vm-username)" \
-        -var "vm_password=$(vm-password)"
-
-      terraform apply -auto-approve \
-        -var "vm_username=$(vm-username)" \
-        -var "vm_password=$(vm-password)"
+      terraform plan
+      terraform apply -auto-approve
