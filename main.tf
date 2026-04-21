@@ -1,6 +1,6 @@
 resource "azurerm_virtual_network" "vnet" {
   name                = "thiru-vnet"
-  location            = "centralindia"
+  location            = "eastus"
   resource_group_name = "thiru-rg"
   address_space       = ["10.0.0.0/16"]
 }
@@ -14,7 +14,7 @@ resource "azurerm_subnet" "subnet" {
 
 resource "azurerm_public_ip" "pip" {
   name                = "thiru-pip"
-  location            = "centralindia"
+  location            = "eastus"
   resource_group_name = "thiru-rg"
 
   allocation_method = "Static"
@@ -23,7 +23,7 @@ resource "azurerm_public_ip" "pip" {
 
 resource "azurerm_network_security_group" "nsg" {
   name                = "thiru-nsg"
-  location            = "centralindia"
+  location            = "eastus"
   resource_group_name = "thiru-rg"
 
   security_rule {
@@ -41,7 +41,7 @@ resource "azurerm_network_security_group" "nsg" {
 
 resource "azurerm_network_interface" "nic" {
   name                = "thiru-nic"
-  location            = "centralindia"
+  location            = "eastus"
   resource_group_name = "thiru-rg"
 
   ip_configuration {
@@ -60,7 +60,7 @@ resource "azurerm_network_interface_security_group_association" "nsgassoc" {
 resource "azurerm_windows_virtual_machine" "vm" {
   name                = "thiru-winvm"
   resource_group_name = "thiru-rg"
-  location            = "centralindia"
+  location            = "eastus"
   size                = "Standard_B1s"
 
   admin_username = "azureuser"
