@@ -1,17 +1,13 @@
-provider "azurerm" {
-  features {}
-}
-
 resource "azurerm_resource_group" "rg" {
   name     = "thiru-rg"
-  location = "southindia"
+  location = "centralindia"
 }
 
 resource "azurerm_virtual_network" "vnet" {
   name                = "thiru-vnet"
-  address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
+  address_space       = ["10.0.0.0/16"]
 }
 
 resource "azurerm_subnet" "subnet" {
@@ -21,28 +17,60 @@ resource "azurerm_subnet" "subnet" {
   address_prefixes     = ["10.0.1.0/24"]
 }
 
+resource "azurerm_public_ip" "pip" {
+  name                = "thiru-pip"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Dynamic"
+}
+
 resource "azurerm_network_interface" "nic" {
   name                = "thiru-nic"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
   ip_configuration {
-    name                          = "internal"
+    name                          = "ipconfig1"
     subnet_id                     = azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id         = azurerm_public_ip.pip.id
   }
 }
 
+resource "azurerm_network_security_group" "nsg" {
+  name                = "thiru-nsg"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  security_rule {
+    name                       = "RDP"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range         = "*"
+    destination_port_range    = "3389"
+    source_address_prefix     = "*"
+    destination_address_prefix = "*"
+  }
+}
+
+resource "azurerm_network_interface_security_group_association" "nsgassoc" {
+  network_interface_id      = azurerm_network_interface.nic.id
+  network_security_group_id = azurerm_network_security_group.nsg.id
+}
+
 resource "azurerm_windows_virtual_machine" "vm" {
-  name                = "thiru-vm"
+  name                = "thiru-winvm"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   size                = "Standard_B2s"
-  admin_username      = var.vm_username
-  admin_password      = var.vm_password
+
+  admin_username = "azureuser"
+  admin_password = "Password@12345!"
 
   network_interface_ids = [
-    azurerm_network_interface.nic.id,
+    azurerm_network_interface.nic.id
   ]
 
   os_disk {
@@ -57,6 +85,3 @@ resource "azurerm_windows_virtual_machine" "vm" {
     version   = "latest"
   }
 }
-
-variable "vm_username" {}
-variable "vm_password" {}
