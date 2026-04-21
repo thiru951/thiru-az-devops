@@ -6,35 +6,16 @@ pool:
 
 steps:
 
-# Install Terraform
 - task: TerraformInstaller@1
   inputs:
     terraformVersion: '1.5.7'
 
-# Terraform Init
 - task: AzureCLI@2
   inputs:
     azureSubscription: 'terraform-sp'
     scriptType: bash
     scriptLocation: inlineScript
     inlineScript: |
-      terraform version
       terraform init
-
-# Terraform Plan
-- task: AzureCLI@2
-  inputs:
-    azureSubscription: 'terraform-sp'
-    scriptType: bash
-    scriptLocation: inlineScript
-    inlineScript: |
       terraform plan
-
-# Terraform Apply
-- task: AzureCLI@2
-  inputs:
-    azureSubscription: 'terraform-sp'
-    scriptType: bash
-    scriptLocation: inlineScript
-    inlineScript: |
       terraform apply -auto-approve
