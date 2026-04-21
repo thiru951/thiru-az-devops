@@ -16,20 +16,9 @@ resource "azurerm_public_ip" "pip" {
   name                = "thiru-pip"
   location            = "centralindia"
   resource_group_name = "thiru-rg"
-  allocation_method   = "Dynamic"
-}
 
-resource "azurerm_network_interface" "nic" {
-  name                = "thiru-nic"
-  location            = "centralindia"
-  resource_group_name = "thiru-rg"
-
-  ip_configuration {
-    name                          = "ipconfig1"
-    subnet_id                     = azurerm_subnet.subnet.id
-    private_ip_address_allocation = "Dynamic"
-    public_ip_address_id         = azurerm_public_ip.pip.id
-  }
+  allocation_method = "Static"
+  sku               = "Standard"
 }
 
 resource "azurerm_network_security_group" "nsg" {
@@ -47,6 +36,19 @@ resource "azurerm_network_security_group" "nsg" {
     destination_port_range    = "3389"
     source_address_prefix     = "*"
     destination_address_prefix = "*"
+  }
+}
+
+resource "azurerm_network_interface" "nic" {
+  name                = "thiru-nic"
+  location            = "centralindia"
+  resource_group_name = "thiru-rg"
+
+  ip_configuration {
+    name                          = "ipconfig1"
+    subnet_id                     = azurerm_subnet.subnet.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id         = azurerm_public_ip.pip.id
   }
 }
 
