@@ -9,35 +9,38 @@ variables:
 
 steps:
 
+# Install Terraform
 - task: TerraformInstaller@1
   inputs:
     terraformVersion: '1.5.7'
 
-- task: AzureCLI@2
-  inputs:
-    azureSubscription: 'terraform-sp'
-    scriptType: bash
-    scriptLocation: inlineScript
-    inlineScript: |
+# Terraform Init
+- script: |
+    set -e
+    terraform init -reconfigure
+  displayName: Init
+  env:
+    ARM_CLIENT_ID: $(servicePrincipalId)
+    ARM_CLIENT_SECRET: $(servicePrincipalKey)
+    ARM_SUBSCRIPTION_ID: $(subscriptionId)
+    ARM_TENANT_ID: $(tenantId)
 
-      set -e
+# Terraform Plan
+- script: |
+    terraform plan -var="admin_password=$(ADMIN_PASSWORD)" -out=tfplan
+  displayName: Plan
+  env:
+    ARM_CLIENT_ID: $(servicePrincipalId)
+    ARM_CLIENT_SECRET: $(servicePrincipalKey)
+    ARM_SUBSCRIPTION_ID: $(subscriptionId)
+    ARM_TENANT_ID: $(tenantId)
 
-      echo "=== CHECK FILES ==="
-      ls -l
-
-      export ARM_CLIENT_ID=$servicePrincipalId
-      export ARM_CLIENT_SECRET=$servicePrincipalKey
-      export ARM_SUBSCRIPTION_ID=$subscriptionId
-      export ARM_TENANT_ID=$tenantId
-
-      echo "=== TERRAFORM INIT ==="
-      terraform init -reconfigure
-
-      echo "=== TERRAFORM PLAN ==="
-      terraform plan -var="admin_password=$(ADMIN_PASSWORD)" -out=tfplan
-
-      echo "=== VERIFY tfplan ==="
-      ls -l tfplan
-
-      echo "=== TERRAFORM APPLY ==="
-      terraform apply -auto-approve tfplan
+# Terraform Apply
+- script: |
+    terraform apply -auto-approve tfplan
+  displayName: Apply
+  env:
+    ARM_CLIENT_ID: $(servicePrincipalId)
+    ARM_CLIENT_SECRET: $(servicePrincipalKey)
+    ARM_SUBSCRIPTION_ID: $(subscriptionId)
+    ARM_TENANT_ID: $(tenantId)
