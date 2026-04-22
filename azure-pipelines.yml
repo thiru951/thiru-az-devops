@@ -9,21 +9,29 @@ variables:
 
 steps:
 
+# Install Terraform
 - task: TerraformInstaller@1
   inputs:
     terraformVersion: '1.5.7'
 
+# Azure + Terraform Execution
 - task: AzureCLI@2
   inputs:
     azureSubscription: 'terraform-sp'
     scriptType: bash
     scriptLocation: inlineScript
     inlineScript: |
+
       export ARM_CLIENT_ID=$servicePrincipalId
       export ARM_CLIENT_SECRET=$servicePrincipalKey
       export ARM_SUBSCRIPTION_ID=$subscriptionId
       export ARM_TENANT_ID=$tenantId
 
-      terraform init
+      echo "Running Terraform Init"
+      terraform init -reconfigure
+
+      echo "Running Terraform Plan"
       terraform plan -var="admin_password=$(ADMIN_PASSWORD)" -out=tfplan
+
+      echo "Running Terraform Apply"
       terraform apply -auto-approve tfplan
