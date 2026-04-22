@@ -19,13 +19,11 @@ steps:
     scriptType: bash
     scriptLocation: inlineScript
     inlineScript: |
-      echo "Connected to Azure"
+      export ARM_CLIENT_ID=$servicePrincipalId
+      export ARM_CLIENT_SECRET=$servicePrincipalKey
+      export ARM_SUBSCRIPTION_ID=$subscriptionId
+      export ARM_TENANT_ID=$tenantId
 
-- script: terraform init
-  displayName: Init
-
-- script: terraform plan -var="admin_password=$(ADMIN_PASSWORD)" -out=tfplan
-  displayName: Plan
-
-- script: terraform apply -auto-approve tfplan
-  displayName: Apply
+      terraform init
+      terraform plan -var="admin_password=$(ADMIN_PASSWORD)" -out=tfplan
+      terraform apply -auto-approve tfplan
