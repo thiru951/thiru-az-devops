@@ -2,6 +2,15 @@ provider "azurerm" {
   features {}
 }
 
+terraform {
+  backend "azurerm" {
+    resource_group_name  = "tfstate-rg"
+    storage_account_name = "thirutfstate123"
+    container_name       = "tfstate"
+    key                  = "vm.tfstate"
+  }
+}
+
 resource "azurerm_resource_group" "rg" {
   name     = "thiru-rg"
   location = "Central India"
@@ -15,7 +24,7 @@ resource "azurerm_virtual_network" "vnet" {
 }
 
 resource "azurerm_subnet" "subnet" {
-  name                 = "thiru-sub"
+  name                 = "thiru-subnet"
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.1.0/24"]
@@ -32,8 +41,8 @@ resource "azurerm_network_security_group" "nsg" {
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
-    source_port_range          = "*"
     destination_port_range     = "3389"
+    source_port_range          = "*"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
@@ -60,22 +69,27 @@ resource "azurerm_network_interface" "nic" {
   }
 }
 
-resource "azurerm_network_interface_security_group_association" "nsg_assoc" {
+resource "azurerm_network_interface_security_group_association" "assoc" {
   network_interface_id      = azurerm_network_interface.nic.id
   network_security_group_id = azurerm_network_security_group.nsg.id
+}
+
+variable "admin_password" {
+  type      = string
+  sensitive = true
 }
 
 resource "azurerm_windows_virtual_machine" "vm" {
   name                = "thiru-win19-vm"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  size                = "Standard_D2s_v3"
 
-  admin_username = var.admin_username
+  size           = "Standard_B1s"
+  admin_username = "azureuser"
   admin_password = var.admin_password
 
   network_interface_ids = [
-    azurerm_network_interface.nic.id,
+    azurerm_network_interface.nic.id
   ]
 
   os_disk {
