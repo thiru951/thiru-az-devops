@@ -9,38 +9,34 @@ variables:
 
 steps:
 
-# Install Terraform
 - task: TerraformInstaller@1
   inputs:
     terraformVersion: '1.5.7'
 
-# Terraform Init
 - script: |
     set -e
     terraform init -reconfigure
   displayName: Init
   env:
-    ARM_CLIENT_ID: $(servicePrincipalId)
-    ARM_CLIENT_SECRET: $(servicePrincipalKey)
-    ARM_SUBSCRIPTION_ID: $(subscriptionId)
-    ARM_TENANT_ID: $(tenantId)
+    ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+    ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+    ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+    ARM_TENANT_ID: $(ARM_TENANT_ID)
 
-# Terraform Plan
 - script: |
     terraform plan -var="admin_password=$(ADMIN_PASSWORD)" -out=tfplan
   displayName: Plan
   env:
-    ARM_CLIENT_ID: $(servicePrincipalId)
-    ARM_CLIENT_SECRET: $(servicePrincipalKey)
-    ARM_SUBSCRIPTION_ID: $(subscriptionId)
-    ARM_TENANT_ID: $(tenantId)
+    ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+    ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+    ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+    ARM_TENANT_ID: $(ARM_TENANT_ID)
 
-# Terraform Apply
 - script: |
     terraform apply -auto-approve tfplan
   displayName: Apply
   env:
-    ARM_CLIENT_ID: $(servicePrincipalId)
-    ARM_CLIENT_SECRET: $(servicePrincipalKey)
-    ARM_SUBSCRIPTION_ID: $(subscriptionId)
-    ARM_TENANT_ID: $(tenantId)
+    ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+    ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+    ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+    ARM_TENANT_ID: $(ARM_TENANT_ID)
