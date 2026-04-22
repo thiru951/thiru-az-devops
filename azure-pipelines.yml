@@ -5,7 +5,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-- group: kv-secrets
+- group: tf-secrets
 
 steps:
 
@@ -19,19 +19,13 @@ steps:
     scriptType: bash
     scriptLocation: inlineScript
     inlineScript: |
-      az account show
+      echo "Connected to Azure"
 
 - script: terraform init
-  displayName: 'Terraform Init'
+  displayName: Init
 
-- script: |
-    terraform plan \
-      -var="admin_username=azureuser" \
-      -var="admin_password=$(vm-password)"
-  displayName: 'Terraform Plan'
+- script: terraform plan -var="admin_password=$(ADMIN_PASSWORD)" -out=tfplan
+  displayName: Plan
 
-- script: |
-    terraform apply -auto-approve \
-      -var="admin_username=azureuser" \
-      -var="admin_password=$(vm-password)"
-  displayName: 'Terraform Apply'
+- script: terraform apply -auto-approve tfplan
+  displayName: Apply
