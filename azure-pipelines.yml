@@ -2,7 +2,10 @@ trigger:
 - main
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'ubuntu-latest'
+
+variables:
+- group: kv-secrets
 
 steps:
 
@@ -16,6 +19,19 @@ steps:
     scriptType: bash
     scriptLocation: inlineScript
     inlineScript: |
-      terraform init
-      terraform plan
-      terraform apply -auto-approve
+      az account show
+
+- script: terraform init
+  displayName: 'Terraform Init'
+
+- script: |
+    terraform plan \
+      -var="admin_username=azureuser" \
+      -var="admin_password=$(vm-password)"
+  displayName: 'Terraform Plan'
+
+- script: |
+    terraform apply -auto-approve \
+      -var="admin_username=azureuser" \
+      -var="admin_password=$(vm-password)"
+  displayName: 'Terraform Apply'
