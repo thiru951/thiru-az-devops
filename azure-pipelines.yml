@@ -18,10 +18,10 @@ steps:
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: |
-      terraform init -reconfigure
+  terraform init -reconfigure
 
-      terraform plan \
-        -var "admin_password=$(admin_password)"
+  terraform apply -auto-approve \
+    -var "admin_password=$(admin_password)"
 
       terraform destroy -auto-approve \
         -var "admin_password=$(admin_password)"
