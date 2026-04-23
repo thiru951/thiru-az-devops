@@ -5,7 +5,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-- group: terraform-vars   # store admin_password here
+- group: terraform-vars
 
 steps:
 - task: TerraformInstaller@1
@@ -18,10 +18,7 @@ steps:
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: |
-  terraform init -reconfigure
+      terraform init -reconfigure
 
-  terraform apply -auto-approve \
-    -var "admin_password=$(admin_password)"
-
-      terraform destroy -auto-approve \
+      terraform apply -auto-approve \
         -var "admin_password=$(admin_password)"
