@@ -23,5 +23,5 @@ steps:
       terraform plan \
         -var "admin_password=$(admin_password)"
 
-      terraform destory -auto-approve \
+      terraform destroy -auto-approve \
         -var "admin_password=$(admin_password)"
