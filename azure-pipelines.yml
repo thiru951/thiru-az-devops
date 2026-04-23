@@ -18,8 +18,7 @@ steps:
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: |
-      echo "Initializing Terraform..."
-      terraform init -reconfigure
+  terraform init -reconfigure
 
-      echo "Destroying resources..."
-      terraform destroy -auto-approve -var "admin_password=$(admin_password)"
+  terraform apply -auto-approve \
+    -var "admin_password=$(admin_password)"
