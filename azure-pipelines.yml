@@ -5,38 +5,23 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-- group: tf-secrets
+- group: terraform-vars   # store admin_password here
 
 steps:
-
 - task: TerraformInstaller@1
   inputs:
-    terraformVersion: '1.5.7'
+    terraformVersion: 'latest'
 
-- script: |
-    set -e
-    terraform init -reconfigure
-  displayName: Init
-  env:
-    ARM_CLIENT_ID: $(ARM_CLIENT_ID)
-    ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
-    ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
-    ARM_TENANT_ID: $(ARM_TENANT_ID)
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'thiru-terraform-project'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      terraform init
 
-- script: |
-    terraform plan -var="admin_password=$(ADMIN_PASSWORD)" -out=tfplan
-  displayName: Plan
-  env:
-    ARM_CLIENT_ID: $(ARM_CLIENT_ID)
-    ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
-    ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
-    ARM_TENANT_ID: $(ARM_TENANT_ID)
+      terraform plan \
+        -var "admin_password=$(admin_password)"
 
-- script: |
-    terraform apply -auto-approve tfplan
-  displayName: Apply
-  env:
-    ARM_CLIENT_ID: $(ARM_CLIENT_ID)
-    ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
-    ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
-    ARM_TENANT_ID: $(ARM_TENANT_ID)
+      terraform apply -auto-approve \
+        -var "admin_password=$(admin_password)"
